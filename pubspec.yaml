@@ -1,0 +1,25 @@
+name: flutter_native_drag_n_drop
+description: A flutter plugin to support the native drag and drop.
+version: 1.2.0
+homepage: https://github.com/skalio/native-drag-and-drop
+
+environment:
+  sdk: ">=2.15.1 <3.0.0"
+  flutter: ">=2.5.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  screenshot: ^1.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:
+  plugin:
+    platforms:
+      macos:
+        pluginClass: FlutterNativeDragNDropPlugin

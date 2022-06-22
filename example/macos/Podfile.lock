@@ -1,0 +1,22 @@
+PODS:
+  - flutter_native_drag_n_drop (0.0.1):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+
+DEPENDENCIES:
+  - flutter_native_drag_n_drop (from `Flutter/ephemeral/.symlinks/plugins/flutter_native_drag_n_drop/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+
+EXTERNAL SOURCES:
+  flutter_native_drag_n_drop:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_native_drag_n_drop/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+
+SPEC CHECKSUMS:
+  flutter_native_drag_n_drop: 34da8c588a822cd9d1d37d0ab57adec6d5823297
+  FlutterMacOS: 57701585bf7de1b3fc2bb61f6378d73bbdea8424
+
+PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
+
+COCOAPODS: 1.11.3
