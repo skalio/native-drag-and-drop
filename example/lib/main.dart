@@ -16,16 +16,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _dragging = false;
-
-  AssetImage? img;
-  ByteData? imageData;
+  AssetImage? _img;
+  ByteData? _imageData;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
 
-    rootBundle.load("assets/nature_1.jpeg").then((imgData) {
-      imageData = imgData;
+    rootBundle.load("assets/maldives.jpg").then((imgData) {
+      setState(() {
+        _imageData = imgData;
+      });
     });
   }
 
@@ -34,7 +35,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: const Text('Plugin example app'),
+            title: const Text('Native drag & drop example'),
           ),
           body: Center(
               child: Row(
@@ -45,51 +46,48 @@ class _MyAppState extends State<MyApp> {
                   return Container(
                     height: 200,
                     width: 200,
-                    color: _dragging
-                        ? Colors.blue.withOpacity(0.4)
-                        : Colors.black26,
-                    child: img != null
-                        ? Image(height: 200, width: 200, image: img!)
-                        : const Center(),
+                    color: _dragging ? Colors.blueAccent : Colors.grey,
+                    child: _img != null
+                        ? Image(height: 200, width: 200, image: _img!)
+                        : const Center(child: Text("Drop Target")),
                   );
                 }),
-                onDragEntered: (d) {
+                onDragEntered: (details) {
                   setState(() {
                     _dragging = true;
                   });
                 },
-                onDragExited: (d) {
+                onDragExited: (details) {
                   setState(() {
                     _dragging = false;
                   });
                 },
-                onDragDone: (d) {
-                  final image = d.items.first.data! as AssetImage;
+                onDragDone: (details) {
+                  AssetImage droppedImage =
+                      details.items.first.data! as AssetImage;
                   setState(() {
                     _dragging = false;
-                    img = image;
+                    _img = droppedImage;
                   });
                 },
-                onWillAccept: (d) {
+                onWillAccept: (details) {
                   return true;
                 },
               ),
               const SizedBox(width: 15),
               NativeDraggable(
                 child: const Image(
-                    height: 300,
-                    width: 300,
-                    image: AssetImage("assets/nature_1.jpeg")),
+                    height: 200,
+                    width: 200,
+                    image: AssetImage("assets/maldives.jpg")),
                 fileStreamCallback: passFileContent,
-                items: [
+                fileItems: [
                   NativeDragFileItem(
-                      fileName: "image.jpeg",
-                      fileSize: 1024,
-                      data: const AssetImage("assets/nature_1.jpeg"))
+                      fileName: "maldives.jpeg",
+                      fileSize:
+                          _imageData != null ? _imageData!.lengthInBytes : 0,
+                      data: const AssetImage("assets/maldives.jpg"))
                 ],
-                onDragStarted: (event) {},
-                onDragUpdate: (event) {},
-                onDragEnd: (event) {},
               ),
             ],
           ))),
@@ -101,13 +99,15 @@ class _MyAppState extends State<MyApp> {
       String fileName,
       String url,
       ProgressController progressController) async* {
-    final buf = imageData!.buffer.asUint8List();
-    final range = buf.length / 5;
+    final buffer = _imageData!.buffer.asUint8List();
+    final range = buffer.length ~/ 10;
 
-    for (var i = 0; i < 5; i++) {
-      final sub =
-          buf.sublist(i * range.toInt(), i * range.toInt() + range.toInt());
+    for (var i = 0; i < 10; i++) {
+      final startByte = i * range;
+      final endByte = startByte + range;
+      final sub = buffer.sublist(startByte, endByte);
       yield sub;
+      progressController.updateProgress(endByte);
       await Future.delayed(const Duration(milliseconds: 500));
     }
     return;
