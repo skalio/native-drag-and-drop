@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_native_drag_n_drop/src/native_drag_item.dart';
 import 'package:flutter_native_drag_n_drop/src/events.dart';
@@ -47,6 +48,7 @@ class DraggableState extends State<NativeDraggable> {
   @override
   void initState() {
     super.initState();
+    RendererBinding.instance.addPostFrameCallback(_postFrameCallback);
     FlutterNativeDragNDrop.instance.init();
     FlutterNativeDragNDrop.instance.addDraggableListener(this);
 
@@ -62,17 +64,6 @@ class DraggableState extends State<NativeDraggable> {
     if (widget.fileItems != null) {
       _createProgressControllers(widget.fileItems!);
     }
-
-    FlutterNativeDragNDrop.instance.removeDraggableView(uniqueKey.toString());
-    RenderBox renderBox =
-        _widgetKey.currentContext!.findRenderObject() as RenderBox;
-    Offset position = renderBox.localToGlobal(Offset.zero);
-    FlutterNativeDragNDrop.instance.setDraggableView(
-        uniqueKey.toString(),
-        position,
-        renderBox.size,
-        null,
-        (widget.items != null) ? widget.items! : widget.fileItems!);
   }
 
   @override
@@ -85,6 +76,22 @@ class DraggableState extends State<NativeDraggable> {
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(key: _widgetKey, child: widget.child);
+  }
+
+  void _postFrameCallback(Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback(_postFrameCallback);
+
+    RenderBox? renderBox =
+        _widgetKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      Offset position = renderBox.localToGlobal(Offset.zero);
+      FlutterNativeDragNDrop.instance.setDraggableView(
+          uniqueKey.toString(),
+          position,
+          renderBox.size,
+          null,
+          (widget.items != null) ? widget.items! : widget.fileItems!);
+    }
   }
 
   /// WIP

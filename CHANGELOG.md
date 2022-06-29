@@ -1,3 +1,7 @@
+## 1.2.2
+
+* fix RenderBoxError during didUpdateWidget()
+
 ## 1.2.1
 
 * update example project & add usage example in readme.md

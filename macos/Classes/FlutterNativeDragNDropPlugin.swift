@@ -7,7 +7,6 @@ public class FlutterNativeDragNDropPlugin: NSObject, FlutterPlugin {
     //MARK: Variables
     static var channel: FlutterMethodChannel!
     static var filePromiseTasks: [String: [FilePromiseTask]] = [:]
-    //private var draggableView: DraggableView?
     private var draggableViews: [String: DraggableView] = [:]
     private var dropTargetView: DropTargetView?
     
@@ -58,6 +57,8 @@ public class FlutterNativeDragNDropPlugin: NSObject, FlutterPlugin {
         let frame = NSRect(origin: origin, size: size)
         
         let draggableView = DraggableView(frame: frame, id: id, dragImage: dragImage, names: names, fileNames: fileNames, fileSizes: fileSizes, channel: FlutterNativeDragNDropPlugin.channel)
+        
+        draggableViews[id]?.removeFromSuperview()
         draggableViews[id] = draggableView
         vc.view.addSubview(draggableView)
     }
@@ -66,7 +67,6 @@ public class FlutterNativeDragNDropPlugin: NSObject, FlutterPlugin {
         let arguments = call.arguments as! Dictionary<String, Any>
         let id = arguments["id"] as! String
         
-        removeDropTargetView()
         draggableViews[id]?.removeFromSuperview()
     }
     

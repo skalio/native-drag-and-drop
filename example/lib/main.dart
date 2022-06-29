@@ -33,65 +33,64 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Native drag & drop example'),
-          ),
-          body: Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              NativeDropTarget(
-                builder: ((context, candidateData, rejectedData) {
-                  return Container(
-                    height: 200,
-                    width: 200,
-                    color: _dragging ? Colors.blueAccent : Colors.grey,
-                    child: _img != null
-                        ? Image(height: 200, width: 200, image: _img!)
-                        : const Center(child: Text("Drop Target")),
-                  );
-                }),
-                onDragEntered: (details) {
-                  setState(() {
-                    _dragging = true;
-                  });
-                },
-                onDragExited: (details) {
-                  setState(() {
-                    _dragging = false;
-                  });
-                },
-                onDragDone: (details) {
-                  AssetImage droppedImage =
-                      details.items.first.data! as AssetImage;
-                  setState(() {
-                    _dragging = false;
-                    _img = droppedImage;
-                  });
-                },
-                onWillAccept: (details) {
-                  return true;
-                },
-              ),
-              const SizedBox(width: 15),
-              NativeDraggable(
-                child: const Image(
-                    height: 200,
-                    width: 200,
-                    image: AssetImage("assets/maldives.jpg")),
-                fileStreamCallback: passFileContent,
-                fileItems: [
-                  NativeDragFileItem(
-                      fileName: "maldives.jpeg",
-                      fileSize:
-                          _imageData != null ? _imageData!.lengthInBytes : 0,
-                      data: const AssetImage("assets/maldives.jpg"))
-                ],
-              ),
-            ],
-          ))),
-    );
+        home: Scaffold(
+            appBar: AppBar(
+              title: const Text('Native drag & drop example'),
+            ),
+            body: Center(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                NativeDropTarget(
+                  builder: ((context, candidateData, rejectedData) {
+                    return Container(
+                      height: 200,
+                      width: 200,
+                      color: _dragging ? Colors.blueAccent : Colors.grey,
+                      child: _img != null
+                          ? Image(height: 200, width: 200, image: _img!)
+                          : const Center(child: Text("Drop Target")),
+                    );
+                  }),
+                  onDragEntered: (details) {
+                    setState(() {
+                      _dragging = true;
+                    });
+                  },
+                  onDragExited: (details) {
+                    setState(() {
+                      _dragging = false;
+                    });
+                  },
+                  onDragDone: (details) {
+                    AssetImage droppedImage =
+                        details.items.first.data! as AssetImage;
+                    setState(() {
+                      _dragging = false;
+                      _img = droppedImage;
+                    });
+                  },
+                  onWillAccept: (details) {
+                    return true;
+                  },
+                ),
+                const SizedBox(width: 15),
+                NativeDraggable(
+                  child: const Image(
+                      height: 200,
+                      width: 200,
+                      image: AssetImage("assets/maldives.jpg")),
+                  fileStreamCallback: passFileContent,
+                  fileItems: [
+                    NativeDragFileItem(
+                        fileName: "maldives.jpeg",
+                        fileSize:
+                            _imageData != null ? _imageData!.lengthInBytes : 0,
+                        data: const AssetImage("assets/maldives.jpg"))
+                  ],
+                )
+              ],
+            ))));
   }
 
   Stream<Uint8List> passFileContent(

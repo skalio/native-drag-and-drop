@@ -2,7 +2,7 @@
 
 A flutter plugin to support the native drag and drop, especially to drag files (only files) out of the application boundary.
 
-<img src="./demonstration.gif" width="800"/>
+<img src="https://raw.githubusercontent.com/skalio/native-drag-and-drop/main/demonstration.gif" width="800"/>
 
 ###
 
