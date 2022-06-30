@@ -6,10 +6,11 @@ import 'native_drag_item.dart';
 import 'native_draggable.dart' as d;
 
 typedef RawDropListener = void Function(DropEvent);
+typedef DragEventListener = void Function(DragEvent event);
+typedef UniqueKeyString = String;
 
 class FlutterNativeDragNDrop {
-  static const MethodChannel _channel =
-      MethodChannel('flutter_native_drag_n_drop');
+  static const MethodChannel _channel = MethodChannel('flutter_native_drag_n_drop');
   static final instance = FlutterNativeDragNDrop._();
 
   FlutterNativeDragNDrop._();
@@ -19,6 +20,10 @@ class FlutterNativeDragNDrop {
 
   /// Used by draggables
   final _draggableListeners = <UniqueKeyString, d.DraggableState>{};
+
+  /// Used by other widgets that want to be informed about drag events
+  final _dragEventListeners = <DragEventListener>{};
+
   late List<NativeDragItem> _draggedItems;
   Offset? _offset;
 
@@ -147,9 +152,8 @@ class FlutterNativeDragNDrop {
   }
 
   void _notifyDragEvent(String id, DragEvent event) {
-    for (final listener in _draggableListeners) {
-      if (id == listener.uniqueKey.toString()) {
-        listener.onDragEvent(event);
+    for (final listener in _dragEventListeners) {
+      listener(event);
       }
     final listener = _draggableListeners[id];
     assert(listener != null, "Drag Event for non existent listener");
@@ -187,5 +191,16 @@ class FlutterNativeDragNDrop {
   void removeDraggableListener(d.DraggableState listener) {
     _draggableListeners.remove(listener.uniqueKey.toString());
   }
+
+  /// Meant for listners outside of this package to listen for general drag events
+  ///
+  /// Be sure to unsubscribe via [removeDragEventListener].
+  void addDragEventListener(DragEventListener listener) {
+    _dragEventListeners.add(listener);
+  }
+
+  /// Unsubsribe after subscription via [addDragEventListener].
+  void removeDragEventListener(DragEventListener listener) {
+    _dragEventListeners.remove(listener);
   }
 }
