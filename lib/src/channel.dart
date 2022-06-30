@@ -154,7 +154,7 @@ class FlutterNativeDragNDrop {
   void _notifyDragEvent(String id, DragEvent event) {
     for (final listener in _dragEventListeners) {
       listener(event);
-      }
+    }
     final listener = _draggableListeners[id];
     assert(listener != null, "Drag Event for non existent listener");
     listener?.onDragEvent(event);
