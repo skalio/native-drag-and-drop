@@ -28,6 +28,32 @@ class _MyAppState extends State<MyApp> {
         _imageData = imgData;
       });
     });
+
+    /// This is how any part of your app could listen to drag events
+    /// E.g. to update other UI once something is dragged
+    FlutterNativeDragNDrop.instance.addDragEventListener(onDragEvent);
+  }
+
+  bool isDragging = false;
+  void onDragEvent(DragEvent e) {
+    if (e is DragBeginEvent) {
+      setState(() {
+        isDragging = true;
+      });
+      return;
+    }
+    if (e is DragEndedEvent) {
+      setState(() {
+        isDragging = false;
+      });
+      return;
+    }
+  }
+
+  @override
+  void dispose() {
+    FlutterNativeDragNDrop.instance.removeDragEventListener(onDragEvent);
+    super.dispose();
   }
 
   @override
@@ -35,7 +61,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(
-              title: const Text('Native drag & drop example'),
+              title: isDragging ? const Text('Its dragging time') : const Text('Native drag & drop example'),
             ),
             body: Center(
                 child: Row(
@@ -63,8 +89,7 @@ class _MyAppState extends State<MyApp> {
                     });
                   },
                   onDragDone: (details) {
-                    AssetImage droppedImage =
-                        details.items.first.data! as AssetImage;
+                    AssetImage droppedImage = details.items.first.data! as AssetImage;
                     setState(() {
                       _dragging = false;
                       _img = droppedImage;
@@ -76,16 +101,12 @@ class _MyAppState extends State<MyApp> {
                 ),
                 const SizedBox(width: 15),
                 NativeDraggable(
-                  child: const Image(
-                      height: 200,
-                      width: 200,
-                      image: AssetImage("assets/maldives.jpg")),
+                  child: const Image(height: 200, width: 200, image: AssetImage("assets/maldives.jpg")),
                   fileStreamCallback: passFileContent,
                   fileItems: [
                     NativeDragFileItem(
                         fileName: "maldives.jpeg",
-                        fileSize:
-                            _imageData != null ? _imageData!.lengthInBytes : 0,
+                        fileSize: _imageData != null ? _imageData!.lengthInBytes : 0,
                         data: const AssetImage("assets/maldives.jpg"))
                   ],
                 )
@@ -94,10 +115,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Stream<Uint8List> passFileContent(
-      NativeDragItem<Object> item,
-      String fileName,
-      String url,
-      ProgressController progressController) async* {
+      NativeDragItem<Object> item, String fileName, String url, ProgressController progressController) async* {
     final buffer = _imageData!.buffer.asUint8List();
     final range = buffer.length ~/ 10;
 
