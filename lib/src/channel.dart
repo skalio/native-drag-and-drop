@@ -20,6 +20,7 @@ class FlutterNativeDragNDrop {
   Offset? _offset;
 
   var _initialized = false;
+  @protected
   init() {
     if (_initialized) {
       return;
@@ -31,8 +32,9 @@ class FlutterNativeDragNDrop {
   }
 
   /// This method creates the draggable view and dropTargetView on native side
-  setDraggableView<T extends Object>(String id, Offset position, Size size,
-      Uint8List? image, List<NativeDragItem> items) async {
+  @protected
+  setDraggableView<T extends Object>(
+      String id, Offset position, Size size, Uint8List? image, List<NativeDragItem> items) async {
     _draggedItems = items;
 
     if (items.first is NativeDragFileItem) {
@@ -62,14 +64,14 @@ class FlutterNativeDragNDrop {
   }
 
   /// This method removes the draggable view and dropTargetView on native side
+  @protected
   removeDraggableView(String id) async {
-    await _channel
-        .invokeMethod("removeDraggableView", <String, dynamic>{"id": id});
+    await _channel.invokeMethod("removeDraggableView", <String, dynamic>{"id": id});
   }
 
+  @protected
   updateProgress(String id, String fileName, int count) {
-    _channel.invokeMethod("updateProgress",
-        <String, dynamic>{"id": id, "fileName": fileName, "count": count});
+    _channel.invokeMethod("updateProgress", <String, dynamic>{"id": id, "fileName": fileName, "count": count});
   }
 
   Future<dynamic> _handleMethodChannel(MethodCall call) async {
@@ -129,10 +131,14 @@ class FlutterNativeDragNDrop {
     }
   }
 
+  /// Used by native drop target
+  @protected
   void addRawDropEventListener(RawDropListener listener) {
     _dropListeners.add(listener);
   }
 
+  /// Used by native drop target
+  @protected
   void removeRawDropEventListener(RawDropListener listener) {
     _dropListeners.remove(listener);
   }
@@ -167,10 +173,14 @@ class FlutterNativeDragNDrop {
     );
   }
 
+  /// Used by native draggable
+  @protected
   void addDraggableListener(d.DraggableState listener) {
     _draggableListeners.add(listener);
   }
 
+  /// Used by native draggable
+  @protected
   void removeDraggableListener(d.DraggableState listener) {
     _draggableListeners.remove(listener);
   }
