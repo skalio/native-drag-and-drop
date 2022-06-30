@@ -14,8 +14,11 @@ class FlutterNativeDragNDrop {
 
   FlutterNativeDragNDrop._();
 
+  /// Used by drop targets
   final _dropListeners = <RawDropListener>{};
-  final _draggableListeners = <d.DraggableState>{};
+
+  /// Used by draggables
+  final _draggableListeners = <UniqueKeyString, d.DraggableState>{};
   late List<NativeDragItem> _draggedItems;
   Offset? _offset;
 
@@ -148,16 +151,16 @@ class FlutterNativeDragNDrop {
       if (id == listener.uniqueKey.toString()) {
         listener.onDragEvent(event);
       }
-    }
+    final listener = _draggableListeners[id];
+    assert(listener != null, "Drag Event for non existent listener");
+    listener?.onDragEvent(event);
   }
 
   _notifyFileStreamEvent(String id, FileStreamEvent event) async {
-    for (final listener in _draggableListeners) {
-      if (id == listener.uniqueKey.toString()) {
-        _listenToFileStream(
-            id, event.fileName, listener.onFileStreamEvent(event));
-      }
-    }
+    final listener = _draggableListeners[id];
+    assert(listener != null, "File Stream Event for non existent listener");
+    if (listener == null) return;
+    _listenToFileStream(id, event.fileName, listener.onFileStreamEvent(event));
   }
 
   _listenToFileStream(String id, String fileName, Stream<Uint8List> stream) {
@@ -176,12 +179,13 @@ class FlutterNativeDragNDrop {
   /// Used by native draggable
   @protected
   void addDraggableListener(d.DraggableState listener) {
-    _draggableListeners.add(listener);
+    _draggableListeners[listener.uniqueKey.toString()] = listener;
   }
 
   /// Used by native draggable
   @protected
   void removeDraggableListener(d.DraggableState listener) {
-    _draggableListeners.remove(listener);
+    _draggableListeners.remove(listener.uniqueKey.toString());
+  }
   }
 }
