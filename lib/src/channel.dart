@@ -56,7 +56,7 @@ class FlutterNativeDragNDrop {
         "image": image,
         "names": fileItems.map((e) => e.name).toList(),
         "fileNames": fileItems.map((e) => e.fileName).toList(),
-        "fileSizes": fileItems.map((e) => e.fileSize).toList()
+        "fileSizes": fileItems.map((e) => e.fileSize).toList(),
       });
     } else {
       await _channel.invokeMethod("setDraggableView", <String, dynamic>{
@@ -66,7 +66,7 @@ class FlutterNativeDragNDrop {
         "width": size.width,
         "height": size.height,
         "image": image,
-        "names": _draggedItems.map((e) => e.name).toList()
+        "names": _draggedItems.map((e) => e.name).toList(),
       });
     }
   }
@@ -74,12 +74,22 @@ class FlutterNativeDragNDrop {
   /// This method removes the draggable view and dropTargetView on native side
   @protected
   removeDraggableView(String id) async {
-    await _channel.invokeMethod("removeDraggableView", <String, dynamic>{"id": id});
+    await _channel.invokeMethod(
+      "removeDraggableView",
+      <String, dynamic>{"id": id},
+    );
   }
 
   @protected
   updateProgress(String id, String fileName, int count) {
-    _channel.invokeMethod("updateProgress", <String, dynamic>{"id": id, "fileName": fileName, "count": count});
+    _channel.invokeMethod(
+      "updateProgress",
+      <String, dynamic>{
+        "id": id,
+        "fileName": fileName,
+        "count": count,
+      },
+    );
   }
 
   Future<dynamic> _handleMethodChannel(MethodCall call) async {
@@ -171,11 +181,25 @@ class FlutterNativeDragNDrop {
     stream.listen(
       (data) {
         _channel.invokeMethod(
-            "feedFileStream", <String, dynamic>{"id": id, "fileName": fileName, "data": data, "status": "kWriting"});
+          "feedFileStream",
+          <String, dynamic>{
+            "id": id,
+            "fileName": fileName,
+            "data": data,
+            "status": "kWriting",
+          },
+        );
       },
       onDone: () {
         _channel.invokeMethod(
-            "feedFileStream", <String, dynamic>{"id": id, "fileName": fileName, "data": null, "status": "kEnded"});
+          "feedFileStream",
+          <String, dynamic>{
+            "id": id,
+            "fileName": fileName,
+            "data": null,
+            "status": "kEnded",
+          },
+        );
       },
     );
   }
