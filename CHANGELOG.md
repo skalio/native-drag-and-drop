@@ -1,3 +1,8 @@
+## 1.2.3
+
+* export events + listeners via singleton
+* add dartdoc comments
+
 ## 1.2.2
 
 * fix RenderBoxError during didUpdateWidget()

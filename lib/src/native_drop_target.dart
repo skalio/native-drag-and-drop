@@ -3,26 +3,45 @@ import 'package:flutter_native_drag_n_drop/src/channel.dart';
 import 'package:flutter_native_drag_n_drop/src/native_drag_item.dart';
 import 'events.dart';
 
+/// An object that contains metadata when the drag is done
 @immutable
 class DropDoneDetails {
-  const DropDoneDetails({required this.items, required this.localPosition, required this.globalPosition});
+  const DropDoneDetails(
+      {required this.items,
+      required this.localPosition,
+      required this.globalPosition});
 
+  /// List with the corresponding drag items
   final List<NativeDragItem> items;
+
+  /// Local position (relative to the application window) of the dropped items
   final Offset localPosition;
+
+  /// Global position (relative to the screen window) of the dropped items
   final Offset globalPosition;
 }
 
+/// An object that contains metadata when the drag is done
 class DropEventDetails {
-  DropEventDetails({required this.items, required this.localPosition, required this.globalPosition});
+  DropEventDetails(
+      {required this.items,
+      required this.localPosition,
+      required this.globalPosition});
 
+  /// List with the corresponding drag item
   final List<NativeDragItem> items;
+
+  /// Local position (relative to the application window) of the dropped items
   final Offset localPosition;
+
+  /// Global position (relative to the screen window) of the dropped items
   final Offset globalPosition;
 }
 
 typedef OnDragDoneCallback = void Function(DropDoneDetails details);
 typedef OnDragCallback<Detail> = void Function(Detail details);
-typedef DragTargetWillAccept<T extends Object> = bool Function(List<NativeDragItem> items);
+typedef DragTargetWillAccept<T extends Object> = bool Function(
+    List<NativeDragItem> items);
 
 /// A widget that accepts draggable files.
 class NativeDropTarget extends StatefulWidget {
@@ -38,12 +57,23 @@ class NativeDropTarget extends StatefulWidget {
   }) : super(key: key);
 
   final DragTargetBuilder<NativeDragItem> builder;
+
+  /// Callback when drag has entered the drop area
   final OnDragCallback<DropEventDetails>? onDragEntered;
+
+  /// Callback when drag has exited the drop area
   final OnDragCallback<DropEventDetails>? onDragExited;
+
+  /// Callback when drag has moved within the drop area
   final OnDragCallback<DropEventDetails>? onDragUpdated;
-  final DragTargetWillAccept? onWillAccept;
+
+  /// Callback when drag has dropped
   final OnDragDoneCallback? onDragDone;
 
+  /// Callback to decide if items will be accept from this drop target
+  final DragTargetWillAccept? onWillAccept;
+
+  /// Flag to enable/disable the response of drags
   final bool enable;
 
   @override
@@ -78,7 +108,8 @@ class _DropTargetState extends State<NativeDropTarget> {
     } else if (!widget.enable && oldWidget.enable) {
       FlutterNativeDragNDrop.instance.removeRawDropEventListener(_onDropEvent);
       if (_status != _DragTargetStatus.idle) {
-        _updateStatus(_DragTargetStatus.idle, localLocation: Offset.zero, globalLocation: Offset.zero, items: []);
+        _updateStatus(_DragTargetStatus.idle,
+            localLocation: Offset.zero, globalLocation: Offset.zero, items: []);
       }
     }
   }
@@ -95,31 +126,65 @@ class _DropTargetState extends State<NativeDropTarget> {
       if (!inBounds) {
         assert(_status == _DragTargetStatus.idle);
       } else {
-        _updateStatus(_DragTargetStatus.enter, globalLocation: globalPosition, localLocation: position, items: event.items);
+        _updateStatus(_DragTargetStatus.enter,
+            globalLocation: globalPosition,
+            localLocation: position,
+            items: event.items);
       }
     } else if (event is DropUpdateEvent) {
       if (_status == _DragTargetStatus.idle && inBounds) {
-        _updateStatus(_DragTargetStatus.enter, globalLocation: globalPosition, localLocation: position, items: event.items);
-      } else if ((_status == _DragTargetStatus.enter || _status == _DragTargetStatus.update) && inBounds) {
-        _updateStatus(_DragTargetStatus.update, globalLocation: globalPosition, localLocation: position, debugRequiredStatus: false, items: event.items);
+        _updateStatus(_DragTargetStatus.enter,
+            globalLocation: globalPosition,
+            localLocation: position,
+            items: event.items);
+      } else if ((_status == _DragTargetStatus.enter ||
+              _status == _DragTargetStatus.update) &&
+          inBounds) {
+        _updateStatus(_DragTargetStatus.update,
+            globalLocation: globalPosition,
+            localLocation: position,
+            debugRequiredStatus: false,
+            items: event.items);
       } else if (_status != _DragTargetStatus.idle && !inBounds) {
-        _updateStatus( _DragTargetStatus.idle, globalLocation: globalPosition, localLocation: position, items: event.items);
+        _updateStatus(_DragTargetStatus.idle,
+            globalLocation: globalPosition,
+            localLocation: position,
+            items: event.items);
       }
     } else if (event is DropExitEvent && _status != _DragTargetStatus.idle) {
-      _updateStatus(_DragTargetStatus.idle, globalLocation: globalPosition, localLocation: position, items: event.items);
-    } else if (event is DropDoneEvent && _status != _DragTargetStatus.idle && inBounds) {
-      _updateStatus( _DragTargetStatus.idle, debugRequiredStatus: false, globalLocation: globalPosition, localLocation: position, items: event.items);
+      _updateStatus(_DragTargetStatus.idle,
+          globalLocation: globalPosition,
+          localLocation: position,
+          items: event.items);
+    } else if (event is DropDoneEvent &&
+        _status != _DragTargetStatus.idle &&
+        inBounds) {
+      _updateStatus(_DragTargetStatus.idle,
+          debugRequiredStatus: false,
+          globalLocation: globalPosition,
+          localLocation: position,
+          items: event.items);
       if (widget.onWillAccept != null && !widget.onWillAccept!(event.items)) {
         return;
       }
-      widget.onDragDone?.call(DropDoneDetails(items: event.items, localPosition: position, globalPosition: globalPosition));
+      widget.onDragDone?.call(DropDoneDetails(
+          items: event.items,
+          localPosition: position,
+          globalPosition: globalPosition));
     }
   }
 
-  void _updateStatus(_DragTargetStatus status, {bool debugRequiredStatus = true, required Offset localLocation, required Offset globalLocation, required List<NativeDragItem> items}) {
+  void _updateStatus(_DragTargetStatus status,
+      {bool debugRequiredStatus = true,
+      required Offset localLocation,
+      required Offset globalLocation,
+      required List<NativeDragItem> items}) {
     assert(!debugRequiredStatus || _status != status);
     _status = status;
-    final details = DropEventDetails(items: items, localPosition: localLocation, globalPosition: globalLocation);
+    final details = DropEventDetails(
+        items: items,
+        localPosition: localLocation,
+        globalPosition: globalLocation);
     switch (_status) {
       case _DragTargetStatus.enter:
         widget.onDragEntered?.call(details);

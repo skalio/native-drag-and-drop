@@ -9,8 +9,11 @@ typedef RawDropListener = void Function(DropEvent);
 typedef DragEventListener = void Function(DragEvent event);
 typedef UniqueKeyString = String;
 
+/// Main communication between the Dart- and native-layer
 class FlutterNativeDragNDrop {
   static const MethodChannel _channel = MethodChannel('flutter_native_drag_n_drop');
+
+  /// Singleton instance
   static final instance = FlutterNativeDragNDrop._();
 
   FlutterNativeDragNDrop._();

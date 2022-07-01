@@ -7,17 +7,37 @@ import 'dart:typed_data';
 import 'channel.dart';
 
 typedef OnDragUpdateCallback = void Function(DragEvent event);
+
+/// Callback which is called when the native layer needs the file bytes
+/// 
+/// [item] is the corresponding [NativeDragFileItem] object
+/// [fileName] is the fileName
+/// [url] is the location where the user dropped the drag file item
+/// [progressController] must be used to inform about the current progress
+/// must return a Stream to write to
 typedef FileStreamCallback = Stream<Uint8List> Function(NativeDragFileItem item,
     String fileName, String url, ProgressController progressController);
 
 /// A widget that can be dragged from to a NativeDragTarget.
 class NativeDraggable extends StatefulWidget {
   final Widget child;
+
+  /// Drag items when dragging only within application
   final List<NativeDragItem>? items;
+
+  /// Drag file items when dragging out of application
   final List<NativeDragFileItem>? fileItems;
+
+  /// Callback which is called when you drop a drag file item out of application boundary
   final FileStreamCallback fileStreamCallback;
+
+  /// Callback when drag has started
   final OnDragUpdateCallback? onDragStarted;
+
+  /// Callback when drag has moved
   final OnDragUpdateCallback? onDragUpdate;
+
+  /// Callback when drag has ended
   final OnDragUpdateCallback? onDragEnd;
 
   const NativeDraggable(
@@ -38,7 +58,11 @@ class NativeDraggable extends StatefulWidget {
 
 class DraggableState extends State<NativeDraggable> {
   final GlobalKey _widgetKey = GlobalKey();
+
+  /// Identifies this receiver across Flutter- and the native-layer
   final UniqueKey uniqueKey = UniqueKey();
+
+  /// List of [ProgressController] objects which controls the progress indicator of every drag file item
   final List<ProgressController> progressControllers = [];
 
   /// WIP
@@ -115,6 +139,7 @@ class DraggableState extends State<NativeDraggable> {
     }
   }
 
+  /// Don't call it by yourself. It is used by this library internally
   Stream<Uint8List> onFileStreamEvent(FileStreamEvent event) {
     final progressController =
         progressControllers.firstWhere((p) => event.fileName == p.fileName);
@@ -122,6 +147,7 @@ class DraggableState extends State<NativeDraggable> {
         event.item, event.fileName, event.url, progressController);
   }
 
+  /// Don't call it by yourself. It is used by this library internally
   void onDragEvent(DragEvent event) {
     if (event is DragBeginEvent) {
       widget.onDragStarted?.call(event);
