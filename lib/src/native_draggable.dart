@@ -5,11 +5,12 @@ import 'package:flutter_native_drag_n_drop/src/events.dart';
 import 'package:flutter_native_drag_n_drop/src/progress_controller.dart';
 import 'dart:typed_data';
 import 'channel.dart';
+import 'package:meta/meta.dart';
 
 typedef OnDragUpdateCallback = void Function(DragEvent event);
 
 /// Callback which is called when the native layer needs the file bytes
-/// 
+///
 /// [item] is the corresponding [NativeDragFileItem] object
 /// [fileName] is the fileName
 /// [url] is the location where the user dropped the drag file item
@@ -73,6 +74,7 @@ class DraggableState extends State<NativeDraggable> {
   void initState() {
     super.initState();
     RendererBinding.instance.addPostFrameCallback(_postFrameCallback);
+    // ignore: invalid_use_of_protected_member
     FlutterNativeDragNDrop.instance.init();
     FlutterNativeDragNDrop.instance.addDraggableListener(this);
 
@@ -139,7 +141,7 @@ class DraggableState extends State<NativeDraggable> {
     }
   }
 
-  /// Don't call it by yourself. It is used by this library internally
+  @internal
   Stream<Uint8List> onFileStreamEvent(FileStreamEvent event) {
     final progressController =
         progressControllers.firstWhere((p) => event.fileName == p.fileName);
@@ -147,7 +149,7 @@ class DraggableState extends State<NativeDraggable> {
         event.item, event.fileName, event.url, progressController);
   }
 
-  /// Don't call it by yourself. It is used by this library internally
+  @internal
   void onDragEvent(DragEvent event) {
     if (event is DragBeginEvent) {
       widget.onDragStarted?.call(event);

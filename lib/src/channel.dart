@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'events.dart';
 import 'native_drag_item.dart';
 import 'native_draggable.dart' as d;
+import 'package:meta/meta.dart';
 
 typedef RawDropListener = void Function(DropEvent);
 typedef DragEventListener = void Function(DragEvent event);
@@ -11,7 +12,8 @@ typedef UniqueKeyString = String;
 
 /// Main communication between the Dart- and native-layer
 class FlutterNativeDragNDrop {
-  static const MethodChannel _channel = MethodChannel('flutter_native_drag_n_drop');
+  static const MethodChannel _channel =
+      MethodChannel('flutter_native_drag_n_drop');
 
   /// Singleton instance
   static final instance = FlutterNativeDragNDrop._();
@@ -31,7 +33,7 @@ class FlutterNativeDragNDrop {
   Offset? _offset;
 
   var _initialized = false;
-  @protected
+  @internal
   init() {
     if (_initialized) {
       return;
@@ -43,9 +45,9 @@ class FlutterNativeDragNDrop {
   }
 
   /// This method creates the draggable view and dropTargetView on native side
-  @protected
-  setDraggableView<T extends Object>(
-      String id, Offset position, Size size, Uint8List? image, List<NativeDragItem> items) async {
+  @internal
+  setDraggableView<T extends Object>(String id, Offset position, Size size,
+      Uint8List? image, List<NativeDragItem> items) async {
     _draggedItems = items;
 
     if (items.first is NativeDragFileItem) {
@@ -75,7 +77,7 @@ class FlutterNativeDragNDrop {
   }
 
   /// This method removes the draggable view and dropTargetView on native side
-  @protected
+  @internal
   removeDraggableView(String id) async {
     await _channel.invokeMethod(
       "removeDraggableView",
@@ -83,7 +85,7 @@ class FlutterNativeDragNDrop {
     );
   }
 
-  @protected
+  @internal
   updateProgress(String id, String fileName, int count) {
     _channel.invokeMethod(
       "updateProgress",
@@ -100,45 +102,53 @@ class FlutterNativeDragNDrop {
       case "draggingEntered":
         final position = (call.arguments as List).cast<double>();
         _offset = Offset(position[0], position[1]);
-        _notifyDropEvent(DropEnterEvent(location: _offset!, items: _draggedItems));
+        _notifyDropEvent(
+            DropEnterEvent(location: _offset!, items: _draggedItems));
         break;
       case "draggingUpdated":
         final position = (call.arguments as List).cast<double>();
         _offset = Offset(position[0], position[1]);
-        _notifyDropEvent(DropUpdateEvent(location: _offset!, items: _draggedItems));
+        _notifyDropEvent(
+            DropUpdateEvent(location: _offset!, items: _draggedItems));
         break;
       case "draggingExited":
-        _notifyDropEvent(DropExitEvent(location: _offset ?? Offset.zero, items: _draggedItems));
+        _notifyDropEvent(DropExitEvent(
+            location: _offset ?? Offset.zero, items: _draggedItems));
         _offset = null;
         break;
       case "performDragOperation":
-        _notifyDropEvent(DropDoneEvent(location: _offset ?? Offset.zero, items: _draggedItems));
+        _notifyDropEvent(DropDoneEvent(
+            location: _offset ?? Offset.zero, items: _draggedItems));
         _offset = null;
         break;
       case "draggingBegin":
         final arguments = Map.from(call.arguments);
         final id = arguments["id"] as String;
         final position = (arguments["position"] as List).cast<double>();
-        _notifyDragEvent(id, DragBeginEvent(location: Offset(position[0], position[1])));
+        _notifyDragEvent(
+            id, DragBeginEvent(location: Offset(position[0], position[1])));
         break;
       case "draggingMoved":
         final arguments = Map.from(call.arguments);
         final id = arguments["id"] as String;
         final position = (arguments["position"] as List).cast<double>();
-        _notifyDragEvent(id, DragMovedEvent(location: Offset(position[0], position[1])));
+        _notifyDragEvent(
+            id, DragMovedEvent(location: Offset(position[0], position[1])));
         break;
       case "draggingEnded":
         final arguments = Map.from(call.arguments);
         final id = arguments["id"] as String;
         final position = (arguments["position"] as List).cast<double>();
-        _notifyDragEvent(id, DragEndedEvent(location: Offset(position[0], position[1])));
+        _notifyDragEvent(
+            id, DragEndedEvent(location: Offset(position[0], position[1])));
         break;
       case "fileStreamCallback":
         final arguments = Map.from(call.arguments);
         final id = arguments["id"] as String;
         final fileName = arguments["fileName"] as String;
         final url = arguments["url"] as String;
-        final item = _draggedItems.firstWhere((i) => i.name == fileName) as NativeDragFileItem;
+        final item = _draggedItems.firstWhere((i) => i.name == fileName)
+            as NativeDragFileItem;
         _notifyFileStreamEvent(id, FileStreamEvent(item, fileName, url));
         break;
       default:
@@ -153,13 +163,13 @@ class FlutterNativeDragNDrop {
   }
 
   /// Used by native drop target
-  @protected
+  @internal
   void addRawDropEventListener(RawDropListener listener) {
     _dropListeners.add(listener);
   }
 
   /// Used by native drop target
-  @protected
+  @internal
   void removeRawDropEventListener(RawDropListener listener) {
     _dropListeners.remove(listener);
   }
@@ -208,13 +218,13 @@ class FlutterNativeDragNDrop {
   }
 
   /// Used by native draggable
-  @protected
+  @internal
   void addDraggableListener(d.DraggableState listener) {
     _draggableListeners[listener.uniqueKey.toString()] = listener;
   }
 
   /// Used by native draggable
-  @protected
+  @internal
   void removeDraggableListener(d.DraggableState listener) {
     _draggableListeners.remove(listener.uniqueKey.toString());
   }
