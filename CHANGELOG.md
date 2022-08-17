@@ -1,3 +1,8 @@
+## 1.2.4
+
+* add mouse distance threshold
+* add visibility detector package
+
 ## 1.2.3
 
 * export events + listeners via singleton

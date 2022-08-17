@@ -69,6 +69,7 @@ class DraggableState extends State<NativeDraggable> {
   /// List of [ProgressController] objects which controls the progress indicator of every drag file item
   final List<ProgressController> progressControllers = [];
 
+  /// Flag which indicates if the widget is visible
   bool _isVisible = true;
 
   /// WIP
