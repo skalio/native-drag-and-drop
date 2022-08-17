@@ -18,6 +18,8 @@ class DraggableView: NSView, NSDraggingSource {
     private let fileNames: [String]?
     private let fileSizes: [Int]?
     private let channel: FlutterMethodChannel
+    private var mouseDownLocation: CGPoint?
+    private let kMouseDragTriggerOffset: CGFloat = 3
     
     //MARK: Init
     init(frame frameRect: NSRect, id: String, dragImage: NSImage?, names: [String], fileNames: [String]?, fileSizes: [Int]?, channel: FlutterMethodChannel) {
@@ -35,7 +37,15 @@ class DraggableView: NSView, NSDraggingSource {
     }
     
     //MARK: Functions
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        mouseDownLocation = self.window?.contentView?.convert(event.locationInWindow, to: self)
+    }
+    
+    
     override func mouseDragged(with event: NSEvent) {
+        super.mouseDragged(with: event)
+        
         var draggingItems: [NSDraggingItem] = []
         var filePromiseTasks: [FilePromiseTask] = []
         
@@ -56,7 +66,17 @@ class DraggableView: NSView, NSDraggingSource {
             FlutterNativeDragNDropPlugin.filePromiseTasks[id] = filePromiseTasks
         }
         
-        self.beginDraggingSession(with: draggingItems, event: event, source: self)
+        if let mouseDownLocation = mouseDownLocation {
+            let newPoint = self.window?.contentView?.convert(event.locationInWindow, to: self)
+            let offset = NSPoint(x: newPoint!.x - mouseDownLocation.x, y: newPoint!.y - mouseDownLocation.y)
+            
+            if offset.x > kMouseDragTriggerOffset || offset.y > kMouseDragTriggerOffset {
+                self.mouseDownLocation = nil
+                self.beginDraggingSession(with: draggingItems, event: event, source: self)
+            }
+        }
+        
+        //self.beginDraggingSession(with: draggingItems, event: event, source: self)
     }
     
     private func createFilePromiseDraggingItem(for fileName: String, with fileSize: Int) -> (NSDraggingItem, FilePromiseTask) {

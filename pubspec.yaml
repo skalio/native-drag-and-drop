@@ -13,6 +13,7 @@ dependencies:
 
   meta: ^1.7.0
   screenshot: ^1.2.3
+  visibility_detector: ^0.3.3
 
 dev_dependencies:
   flutter_test:

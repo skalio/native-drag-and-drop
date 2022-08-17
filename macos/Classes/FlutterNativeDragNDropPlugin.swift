@@ -58,6 +58,12 @@ public class FlutterNativeDragNDropPlugin: NSObject, FlutterPlugin {
         
         let draggableView = DraggableView(frame: frame, id: id, dragImage: dragImage, names: names, fileNames: fileNames, fileSizes: fileSizes, channel: FlutterNativeDragNDropPlugin.channel)
         
+        /*
+        // only for debugging
+        draggableView.wantsLayer = true
+        draggableView.layer?.backgroundColor = NSColor.blue.withAlphaComponent(0.3).cgColor
+         */
+        
         draggableViews[id]?.removeFromSuperview()
         draggableViews[id] = draggableView
         vc.view.addSubview(draggableView)
@@ -68,6 +74,7 @@ public class FlutterNativeDragNDropPlugin: NSObject, FlutterPlugin {
         let id = arguments["id"] as! String
         
         draggableViews[id]?.removeFromSuperview()
+        draggableViews[id] = nil
     }
     
     private func setDropTargetView() {
